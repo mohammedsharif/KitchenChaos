@@ -3,24 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IKitchenObjectParent
 {
     public static Player Instance {get; private set;}
 
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
     public class OnSelectedCounterChangedEventArgs : EventArgs
     {
-        public ClearCounter selectedCounter;
+        public BaseCounter selectedCounter;
     }
 
     [SerializeField] private GameInput gameInput;
     [SerializeField] float movementSpeed = 7f;
     [SerializeField] float rotationSpeed = 10f;
     [SerializeField] LayerMask countersLayerMask;
+    [SerializeField] private Transform kitchenObjectHoldPoint;
 
     private bool isWalking;
     private Vector3 lastMoveDirection;
-    private ClearCounter SelectedCounter;
+    private BaseCounter SelectedCounter;
+    private KitchenObject kitchenObject;
 
     private void Awake() 
     {
@@ -38,7 +40,7 @@ public class Player : MonoBehaviour
     private void GameInput_OnInteractAction(object sender, System.EventArgs e)
     {
         if(SelectedCounter != null)
-            SelectedCounter.Interact();
+            SelectedCounter.Interact(this);
     }
 
     private void Update() 
@@ -63,7 +65,7 @@ public class Player : MonoBehaviour
         float interactDistance = 2f;
         if(Physics.Raycast(transform.position, lastMoveDirection, out RaycastHit raycastHit, interactDistance, countersLayerMask))
         {
-            if(raycastHit.transform.TryGetComponent<ClearCounter>(out ClearCounter clearCounter))
+            if(raycastHit.transform.TryGetComponent<BaseCounter>(out BaseCounter clearCounter))
             {
                 if(SelectedCounter != clearCounter)
                     SetSelectedCounter(clearCounter);
@@ -114,7 +116,7 @@ public class Player : MonoBehaviour
         transform.forward = Vector3.Slerp(transform.forward, moveDir, rotationSpeed * Time.deltaTime);
     }
 
-    private void SetSelectedCounter(ClearCounter SelectedCounter)
+    private void SetSelectedCounter(BaseCounter SelectedCounter)
     {
         this.SelectedCounter = SelectedCounter;
 
@@ -123,4 +125,28 @@ public class Player : MonoBehaviour
         });
     }
 
+    public Transform GetKitchenObjectFollowTransform()
+    {
+        return kitchenObjectHoldPoint;
+    }
+
+    public void SetKitchenObject(KitchenObject kitchenObject)
+    {
+        this.kitchenObject = kitchenObject;
+    }
+
+    public KitchenObject GetKitchenObject()
+    {
+        return kitchenObject;
+    }
+
+    public void ClearKitchenObject()
+    {
+        this.kitchenObject = null;
+    }
+
+    public bool HasKitchenObject()
+    {
+        return kitchenObject != null;
+    }
 }
