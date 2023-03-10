@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CuttingCounter : BaseCounter
 {
-    [SerializeField] private KitchenObjectSO cuttingKitchenObjectSO;
+    [SerializeField] private CuttingReceipeSO[] cuttingReceipeSOArray;
 
     public override void Interact(Player player)
     {
@@ -14,7 +14,11 @@ public class CuttingCounter : BaseCounter
             if(player.HasKitchenObject())
             {
                 //player has something
-                player.GetKitchenObject().SetKitchenObjectParent(this);
+                if(HasOutputForInput(player.GetKitchenObject().GetKitchenObjectSO()))
+                {
+                    //player carrying something that can be cut
+                    player.GetKitchenObject().SetKitchenObjectParent(this);
+                }
             }
             else
             {
@@ -40,12 +44,38 @@ public class CuttingCounter : BaseCounter
 
     public override void InteractAlternate(Player player)
     {
-        if(HasKitchenObject())
+        if(HasKitchenObject() && HasOutputForInput(GetKitchenObject().GetKitchenObjectSO()))
         {
+            KitchenObjectSO output = GetOutputForInput(GetKitchenObject().GetKitchenObjectSO());
             GetKitchenObject().DestroySelf();
 
-            KitchenObject.SpawnKitchenObject(cuttingKitchenObjectSO, this);    
+            KitchenObject.SpawnKitchenObject(output, this);    
 
         }
     }
+
+    private bool HasOutputForInput(KitchenObjectSO inputKitchenObjectSO)
+    {
+        foreach(CuttingReceipeSO cuttingReceipeSO in cuttingReceipeSOArray)
+        {
+            if(cuttingReceipeSO.input == inputKitchenObjectSO)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private KitchenObjectSO GetOutputForInput(KitchenObjectSO inputKitchenObjectSO)
+    {
+        foreach(CuttingReceipeSO cuttingReceipeSO in cuttingReceipeSOArray)
+        {
+            if(cuttingReceipeSO.input == inputKitchenObjectSO)
+            {
+                return cuttingReceipeSO.output;
+            }
+        }
+        return null;
+    }
+
 }
