@@ -22,7 +22,9 @@ public class PlateKitchenObject : KitchenObject
     public bool TryAddIngredient(KitchenObjectSO kitchenObjectSO)
     {
         if(!validKitchenObjectSO.Contains(kitchenObjectSO))
+        {
             return false;
+        }
         if(kitchenObjectSOList.Contains(kitchenObjectSO))
         {
             return false;

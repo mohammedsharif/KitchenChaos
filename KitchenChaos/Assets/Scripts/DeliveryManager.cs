@@ -6,7 +6,9 @@ using UnityEngine;
 public class DeliveryManager : MonoBehaviour
 {
     public event EventHandler OnReceipeSpawned;
-    public event EventHandler OnReceipeCompleted;  
+    public event EventHandler OnReceipeCompleted;
+    public event EventHandler OnReceipeSuccess;
+    public event EventHandler OnReceipeFailed;  
 
     public static DeliveryManager Instance {get; private set;}
 
@@ -27,7 +29,7 @@ public class DeliveryManager : MonoBehaviour
     {
         spawnReceipeTimer -= Time.deltaTime;
 
-        if(spawnReceipeTimer < 0f)
+        if(spawnReceipeTimer <= 0f)
         {
             spawnReceipeTimer = spawnReceipeTimerMax;
 
@@ -64,18 +66,19 @@ public class DeliveryManager : MonoBehaviour
                             ingredientFound = true;
                             break;
                         }
-                        if(!ingredientFound)
-                        {
-                            //this receipe ingredient was not found on the plate
-                            plateContentsMatchesReceipe = false;   
-                        }
+                    }
+                    if(!ingredientFound)
+                    {
+                        //this receipe ingredient was not found on the plate
+                        plateContentsMatchesReceipe = false; 
                     }
                 }
                 if(plateContentsMatchesReceipe)
                 {
                     waitingReceipeSOList.RemoveAt(i);
                     //player delivered the correct receipe
-                    OnReceipeSpawned?.Invoke(this, EventArgs.Empty);
+                    OnReceipeCompleted?.Invoke(this, EventArgs.Empty);
+                    OnReceipeSuccess?.Invoke(this, EventArgs.Empty);
 
                     return;
                 }
@@ -83,6 +86,7 @@ public class DeliveryManager : MonoBehaviour
         }
         //No matches found
         //player did not deliver a correct receipe
+        OnReceipeFailed?.Invoke(this, EventArgs.Empty);
     }
 
     public List<ReceipeSO> GetWaitingReceipeSOList()
