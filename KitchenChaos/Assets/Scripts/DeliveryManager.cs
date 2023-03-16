@@ -18,6 +18,7 @@ public class DeliveryManager : MonoBehaviour
     private float spawnReceipeTimer;
     private float spawnReceipeTimerMax = 4f;
     private int waitingReceipeMax = 4;
+    private int successfulReceipesDeliveredAmount;
 
     private void Awake() 
     {
@@ -80,6 +81,8 @@ public class DeliveryManager : MonoBehaviour
                     OnReceipeCompleted?.Invoke(this, EventArgs.Empty);
                     OnReceipeSuccess?.Invoke(this, EventArgs.Empty);
 
+                    successfulReceipesDeliveredAmount++;
+
                     return;
                 }
             }
@@ -92,5 +95,10 @@ public class DeliveryManager : MonoBehaviour
     public List<ReceipeSO> GetWaitingReceipeSOList()
     {
         return waitingReceipeSOList;
+    }
+
+    public int GetSuccessfulReceipesDeliveredAmount()
+    {
+        return successfulReceipesDeliveredAmount;
     }
 }
