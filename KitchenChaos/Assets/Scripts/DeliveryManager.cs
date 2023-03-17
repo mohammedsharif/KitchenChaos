@@ -34,7 +34,7 @@ public class DeliveryManager : MonoBehaviour
         {
             spawnReceipeTimer = spawnReceipeTimerMax;
 
-            if(waitingReceipeSOList.Count < waitingReceipeMax)
+            if(KitchenGameManager.Instance.IsGamePlaying() && waitingReceipeSOList.Count < waitingReceipeMax)
             {
                 ReceipeSO waitingReceipeSO = receipeListSO.receipeSOList[UnityEngine.Random.Range(0, receipeListSO.receipeSOList.Count)];
                 waitingReceipeSOList.Add(waitingReceipeSO);
